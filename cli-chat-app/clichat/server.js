@@ -1,29 +1,7 @@
 const net = require("net");
 const fs = require("fs");
-
-class DataModel {
-   constructor() {
-      this.users = [];
-      this.userID = 0; //counter variable for alotting id to logged in user
-   }
-   getUserByUsername(username) {
-      var users = this.users.find(function (user) {
-         return user.username == username;
-      });
-      return user;
-   }
-   getLoggedInUsers() {
-      var loggedInUsers = [];
-      for (var e = 0; e < this.users.length; e++) {
-         if (this.users[e].loggedIn) {
-            loggedInUsers.push(this.users[e].username);
-         }
-         return loggedInUsers;
-      }
-   }
-}
+const { json } = require("stream/consumers");
 class Response {
-   //whatever we have to pass or return we will use this wrapper
    constructor() {
       this.action = "";
       this.success = false;
@@ -32,14 +10,36 @@ class Response {
    }
 }
 
-var model = new DataModel(); //now creating its global variable
-//populating the data structure by reading from users.data file
+class DataModel {
+   constructor() {
+      this.users = [];
+      this.userID = 0;
+   }
+   getUserByUsername(username) {
+      var user = this.users.find(function (user) {
+         return user.username == username;
+      });
+      return user;
+   }
+   getLoggedInUsers() {
+      var loggedInUsers = [];
+      for (var e = 0; e < this.users.length; e++) {
+         if (this.users[e].loggedIn == true) {
+            loggedInUsers.push(this.users[e].username);
+         }
+      }
+      return loggedInUsers;
+   }
+}
+
+var model = new DataModel();
+
 function populateDataStructure() {
    var usersJSONString = fs.readFileSync("users.data", "utf-8");
    var users = JSON.parse(usersJSONString).users;
    users.forEach(function (user) {
-      users.loggedIn = false;
-      users.id = 0;
+      user.loggedIn = false;
+      user.id = 0;
       model.users.push(user);
    });
 }
@@ -55,24 +55,24 @@ function processRequest(requestObject) {
       }
       let response = new Response();
       response.action = requestObject.action;
-      response.success = success;
       if (success) {
          response.error = "";
-         response.result = "";
          model.userID++;
          requestObject.socket.userID = model.userID;
-         user.ID = model.userID;
+         userID = model.userID;
          user.loggedIn = true;
          response.result = {
             "username": user.username,
-            "id": user.id
+            "id": userID
          };
       } else {
          response.error = "Invalid username/password";
          response.result = "";
       }
+      console.log(response.result.username, response.result.id); //extra comment added to show users that have been logged in.
+      response.success = success;
       requestObject.socket.write(JSON.stringify(response));
-   } //login part ends here
+   }
    if (requestObject.action == "logout") {
    } //logout part ends here
    if (requestObject.action == "getUsers") {
@@ -86,7 +86,7 @@ function processRequest(requestObject) {
 populateDataStructure();
 var server = net.createServer(function (socket) {
    socket.on("data", function (data) {
-      var requestObject = JSON.parse(data); //some more programming is required to handle fragments of data
+      var requestObject = JSON.parse(data);
       requestObject.socket = socket;
       try {
          processRequest(requestObject);
@@ -95,12 +95,12 @@ var server = net.createServer(function (socket) {
       }
    });
    socket.on("end", function () {
-      console.log("Client closed connection"); //more programming is required
+      console.log("Client closed Connection");
    });
    socket.on("error", function () {
-      console.log("There is some error occured at client side!!!!."); //(we will change this later on)
+      console.log("Some error on Client Side");
    });
 });
 
 server.listen(5500, "localhost");
-console.log("Chat server is ready to accept request on port 5500");
+console.log("Chat Sever is ready to accept request on port 5500");
