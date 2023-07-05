@@ -55,30 +55,24 @@ function processLoginActionResponse(response) {
    }
 }
 
-function processLogoutAction() {}
-function processLogoutActionResponse(response) {}
-
 async function processAcceptCommandAction() {
    let ioInterface = readline.createInterface({
       "input": process.stdin,
       "output": process.stdout
    });
-   let command = await acceptInput(
-      `${model.user.username}(${model.user.id})>`,
-      ioInterface
-   );
+   while (true) {
+      let command = await acceptInput(
+         `${model.user.username}(${model.user.id})>`,
+         ioInterface
+      );
+      let request = new Request();
+      request.action = command;
+      request.userID = model.user.id;
+      client.write(JSON.stringify(request));
+      if (command == "logout") break;
+   }
    ioInterface.close();
-   let request = new Request();
-   request.action = command;
-   client.write(JSON.stringify(request));
-}
-function processAcceptCommandActionResponse(response) {
-   if (response.action == "getUsers") {
-      eventEmitter.emit("usersListArrived", response.result);
-   }
-   if (response.action == "logout") {
-      eventEmitter.emit("loggedOut");
-   }
+   processAction("login");
 }
 
 //event
@@ -86,17 +80,9 @@ function loggedIn() {
    console.log(`Welcome ${model.user.username}`);
    processAction("acceptCommand");
 }
-function usersListArrived(users) {
-   console.log("List of online users :");
-   for (var e = 0; e < users.length; e++) {
-      console.log(users[e]);
-   }
-   processAction("acceptCommand");
-}
 
 //setting up events
 eventEmitter.on("loggedIn", loggedIn);
-eventEmitter.on("usersListArrived", usersListArrived);
 
 client = new net.Socket();
 client.connect(5500, "localhost", function () {
@@ -107,9 +93,6 @@ client.connect(5500, "localhost", function () {
 client.on("data", function (data) {
    var response = JSON.parse(data);
    if (response.action == "login") processLoginActionResponse(response);
-   else if (response.action == "logout") processLogoutActionResponse(response);
-   else if (response.action == "getUsers")
-      processAcceptCommandActionResponse(response);
 });
 
 client.on("end", function () {});

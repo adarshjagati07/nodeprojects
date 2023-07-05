@@ -1,6 +1,5 @@
 const net = require("net");
 const fs = require("fs");
-const { json } = require("stream/consumers");
 class Response {
    constructor() {
       this.action = "";
@@ -18,6 +17,12 @@ class DataModel {
    getUserByUsername(username) {
       var user = this.users.find(function (user) {
          return user.username == username;
+      });
+      return user;
+   }
+   getUserByID(id) {
+      var user = this.users.find(function (user) {
+         return user.id == id;
       });
       return user;
    }
@@ -40,6 +45,7 @@ function populateDataStructure() {
    users.forEach(function (user) {
       user.loggedIn = false;
       user.id = 0;
+      users.monitorSocket = null;
       model.users.push(user);
    });
 }
@@ -60,6 +66,7 @@ function processRequest(requestObject) {
          model.userID++;
          requestObject.socket.userID = model.userID;
          userID = model.userID;
+         user.id = userID;
          user.loggedIn = true;
          response.result = {
             "username": user.username,
@@ -72,14 +79,44 @@ function processRequest(requestObject) {
       console.log(response.result.username, response.result.id); //extra comment added to show users that have been logged in.
       response.success = success;
       requestObject.socket.write(JSON.stringify(response));
-   }
-   if (requestObject.action == "logout") {
-   } //logout part ends here
-   if (requestObject.action == "getUsers") {
+   } //login part ends here
+
+   if (requestObject.action == "createMonitor") {
+      let userID = requestObject.userID;
+      let user = model.getUserByID(userID);
       var response = new Response();
       response.action = requestObject.action;
-      response.result = model.getLoggedInUsers();
+      if (user) {
+         user.monitorSocket = requestObject.socket;
+         response.result = user.username;
+      } else {
+         response.result = "";
+      }
       requestObject.socket.write(JSON.stringify(response));
+   } //createMonitor part ends here
+
+   if (requestObject.action == "logout") {
+      let userID = requestObject.userID;
+      let user = model.getUserByID(userID);
+      if (user && user.monitorSocket) {
+         var response = new Response();
+         response.action = requestObject.action;
+         user.monitorSocket.write(JSON.stringify(response));
+      }
+      user.loggedIn = false;
+      user.id = 0;
+      user.monitorSocket = null;
+   } //logout part ends here
+
+   if (requestObject.action == "getUsers") {
+      let userID = requestObject.userID;
+      let user = model.getUserByID(userID);
+      if (user && user.monitorSocket) {
+         var response = new Response();
+         response.action = requestObject.action;
+         response.result = model.getLoggedInUsers();
+         user.monitorSocket.write(JSON.stringify(response));
+      }
    } //getUsers part ends here
 }
 
