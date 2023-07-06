@@ -95,6 +95,20 @@ function processRequest(requestObject) {
       requestObject.socket.write(JSON.stringify(response));
    } //createMonitor part ends here
 
+   if (requestObject.action == "broadcast") {
+      let message = requestObject.message;
+      let fromUser = requestObject.fromUser;
+      model.users.forEach(function (user) {
+         if (user.loggedIn && user.monitorSocket) {
+            var response = new Response();
+            response.action = requestObject.action;
+            response.message = message;
+            response.fromUser = fromUser;
+            user.monitorSocket.write(JSON.stringify(response));
+         }
+      });
+   }
+
    if (requestObject.action == "logout") {
       let userID = requestObject.userID;
       let user = model.getUserByID(userID);

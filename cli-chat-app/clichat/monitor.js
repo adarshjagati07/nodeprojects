@@ -41,12 +41,16 @@ function monitorDenied() {
    console.log(`Unable to create monitor as id : ${model.id} is invalid.`);
    process.exit(0);
 }
+function broadcastArrived(fromUser, message) {
+   console.log("Broadcast from : " + fromUser + "> " + message);
+}
 
 //setting up events
 eventEmitter.on("loggedOut", loggedOut);
 eventEmitter.on("usersListArrived", usersListArrived);
 eventEmitter.on("monitorCreated", monitorCreated);
 eventEmitter.on("monitorDenied", monitorDenied);
+eventEmitter.on("broadcastArrived", broadcastArrived);
 
 model.id = process.argv[2];
 client = new net.Socket();
@@ -67,6 +71,12 @@ client.on("data", function (data) {
       }
    }
    if (response.action == "logout") eventEmitter.emit("loggedOut");
+   if (response.action == "broadcast")
+      eventEmitter.emit(
+         "broadcastArrived",
+         response.fromUser,
+         response.message
+      );
    if (response.action == "getUsers")
       eventEmitter.emit("usersListArrived", response.result);
 });

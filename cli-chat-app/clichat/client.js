@@ -21,6 +21,36 @@ class Request {
       this.action = "";
    }
 }
+
+function processSpaces(command) {
+   command = command.trim();
+   while (true) {
+      var i = command.indexOf("  "); //two spaces
+      if (i == -1) break;
+      command = command.replace("  ", " "); //two spaces followed by 1 space
+   }
+   return command;
+}
+function isValidCommand(command) {
+   if (command == "logout") return true;
+   if (command == "getUsers") return true;
+   if (command.startsWith("send ")) {
+      //command = processSpaces(this.command);
+      var pcs = command.split(" "); //one space
+      if (pcs.length >= 3) return true;
+   }
+   if (command.startsWith("broadcast ")) {
+      while (true) {
+         var i = command.indexOf("  ");
+         if (i == -1) break;
+         command = command.replace("  ", " "); //two spaces followed by one space
+      }
+      var pcs = command.split(" ");
+      if (pcs.length >= 2) return true;
+   }
+   return false;
+}
+
 var model = new DataModel();
 var eventEmitter = new events.EventEmitter();
 var client = null;
@@ -65,10 +95,30 @@ async function processAcceptCommandAction() {
          `${model.user.username}(${model.user.id})>`,
          ioInterface
       );
+      command = processSpaces(command);
+      if (isValidCommand(command) == false) {
+         console.log("Invalid Command/Syntax!!!");
+         continue;
+      }
       let request = new Request();
-      request.action = command;
-      request.userID = model.user.id;
-      client.write(JSON.stringify(request));
+      if (command.startsWith("send ")) {
+         var spc1 = command.indexOf(" ");
+         var spc2 = command.indexOf(" ", spc1 + 1);
+         var message = command.substring(spc2 + 1);
+         var toUser = command.substring(spc1 + 1, spc2);
+         //ye to get completed
+      }
+      if (command.startsWith("broadcast ")) {
+         request.action = "broadcast";
+         request.fromUser = model.user.username;
+         request.message = command.substring(10);
+         client.write(JSON.stringify(request));
+      }
+      if (command == "getUsers" || command == "logout") {
+         request.action = command;
+         request.userID = model.user.id;
+         client.write(JSON.stringify(request));
+      }
       if (command == "logout") break;
    }
    ioInterface.close();
