@@ -1,3 +1,4 @@
+//this is just a testcase to check the connectivity of our users.data file (Additonal of our code)
 const fs=require('fs');
 var usersJSONString = fs.readFileSync("users.data","utf-8");
 console.log(usersJSONString);
