@@ -1,5 +1,6 @@
 const net = require("net");
 const events = require("events");
+const { EventEmitter } = require("stream");
 
 class DataModel {
    constructor() {
@@ -44,6 +45,12 @@ function monitorDenied() {
 function broadcastArrived(fromUser, message) {
    console.log("Broadcast from : " + fromUser + "> " + message);
 }
+function messageArrived(fromUser, message) {
+   console.log(fromUser + ">" + message);
+}
+function notificationArrived(notification) {
+   console.log("Notification-->" + notification);
+}
 
 //setting up events
 eventEmitter.on("loggedOut", loggedOut);
@@ -51,6 +58,8 @@ eventEmitter.on("usersListArrived", usersListArrived);
 eventEmitter.on("monitorCreated", monitorCreated);
 eventEmitter.on("monitorDenied", monitorDenied);
 eventEmitter.on("broadcastArrived", broadcastArrived);
+eventEmitter.on("messageArrived", messageArrived);
+eventEmitter.on("notificationArrived", notificationArrived);
 
 model.id = process.argv[2];
 client = new net.Socket();
@@ -77,6 +86,10 @@ client.on("data", function (data) {
          response.fromUser,
          response.message
       );
+   if (response.action == "send")
+      eventEmitter.emit("messageArrived", response.fromUser, response.message);
+   if (response.action == "notification")
+      eventEmitter.emit("notificationArrived", response.notificationMessage);
    if (response.action == "getUsers")
       eventEmitter.emit("usersListArrived", response.result);
 });

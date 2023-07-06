@@ -79,6 +79,26 @@ function processRequest(requestObject) {
       console.log(response.result.username, response.result.id); //extra comment added to show users that have been logged in.
       response.success = success;
       requestObject.socket.write(JSON.stringify(response));
+      if (success) {
+         let username = user.username;
+         let notificationMessage = username + " has logged in...";
+         var e = 0;
+         while (e < model.users.length) {
+            user = model.users[e];
+            if (
+               user.username != username &&
+               user.loggedIn &&
+               user.monitorSocket
+            ) {
+               response = new Response();
+               response.action = "notification";
+               response.notificationMessage = notificationMessage;
+               console.log(JSON.stringify(response));
+               user.monitorSocket.write(JSON.stringify(response));
+            }
+            e++;
+         }
+      }
    } //login part ends here
 
    if (requestObject.action == "createMonitor") {
@@ -94,6 +114,39 @@ function processRequest(requestObject) {
       }
       requestObject.socket.write(JSON.stringify(response));
    } //createMonitor part ends here
+
+   if (requestObject.action == "send") {
+      let message = requestObject.message;
+      let fromUser = requestObject.fromUser;
+      let toUser = requestObject.toUser;
+      let user = model.getUserByUsername(fromUser);
+      console.log(fromUser, toUser);
+      if (user && user.loggedIn && user.monitorSocket) {
+         user2 = model.getUserByUsername(toUser);
+         if (user2 && user2.loggedIn && user2.monitorSocket) {
+            console.log("When user2 is !correct");
+            var response = new Response();
+            response.action = requestObject.action;
+            response.message = message;
+            response.fromUser = fromUser;
+            user.monitorSocket.write(JSON.stringify(response));
+         } else {
+            var response = new Response();
+            response.action = requestObject.action;
+            response.message = "User:" + toUser + " doesn't exist!";
+            response.fromUser = fromUser;
+            user.monitorSocket.write(JSON.stringify(response));
+         }
+      }
+      user = model.getUserByUsername(toUser);
+      if (user && user.loggedIn && user.monitorSocket && fromUser != toUser) {
+         var response = new Response();
+         response.action = requestObject.action;
+         response.message = message;
+         response.fromUser = fromUser;
+         user.monitorSocket.write(JSON.stringify(response));
+      }
+   }
 
    if (requestObject.action == "broadcast") {
       let message = requestObject.message;
@@ -120,6 +173,21 @@ function processRequest(requestObject) {
       user.loggedIn = false;
       user.id = 0;
       user.monitorSocket = null;
+
+      let username = user.username;
+      let notificationMessage = username + " has logged out...";
+      var e = 0;
+      while (e < model.users.length) {
+         user = model.users[e];
+         if (user.username != username && user.loggedIn && user.monitorSocket) {
+            response = new Response();
+            response.action = "notification";
+            response.notificationMessage = notificationMessage;
+            console.log(JSON.stringify(response));
+            user.monitorSocket.write(JSON.stringify(response));
+         }
+         e++;
+      }
    } //logout part ends here
 
    if (requestObject.action == "getUsers") {

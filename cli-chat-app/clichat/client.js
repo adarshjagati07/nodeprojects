@@ -106,7 +106,11 @@ async function processAcceptCommandAction() {
          var spc2 = command.indexOf(" ", spc1 + 1);
          var message = command.substring(spc2 + 1);
          var toUser = command.substring(spc1 + 1, spc2);
-         //ye to get completed
+         request.action = "send";
+         request.toUser = toUser;
+         request.fromUser = model.user.username;
+         request.message = message;
+         client.write(JSON.stringify(request));
       }
       if (command.startsWith("broadcast ")) {
          request.action = "broadcast";

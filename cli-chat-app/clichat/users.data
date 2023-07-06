@@ -1,6 +1,7 @@
 {
 "users" : [
 {"username":"Adarsh","password":"Adarsh"},
+{"username":"Anmol","password":"Anmol"},
 {"username":"Sarwang","password":"Sarwang"},
 {"username":"Aditya","password":"Aditya"},
 {"username":"Kashyap","password":"Kashyap"},
