@@ -55,6 +55,7 @@ function processRequest(requestObject) {
       let username = requestObject.username;
       let password = requestObject.password;
       let user = model.getUserByUsername(username);
+      let socketReference = requestObject.socket;
       var success = false;
       if (user) {
          if (password == user.password) success = true;
@@ -70,7 +71,8 @@ function processRequest(requestObject) {
          user.loggedIn = true;
          response.result = {
             "username": user.username,
-            "id": userID
+            "id": userID,
+            "socketReference": socketReference
          };
       } else {
          response.error = "Invalid username/password";
@@ -124,7 +126,6 @@ function processRequest(requestObject) {
       if (user && user.loggedIn && user.monitorSocket) {
          user2 = model.getUserByUsername(toUser);
          if (user2 && user2.loggedIn && user2.monitorSocket) {
-            console.log("When user2 is !correct");
             var response = new Response();
             response.action = requestObject.action;
             response.message = message;
@@ -213,7 +214,8 @@ var server = net.createServer(function (socket) {
          console.log(e);
       }
    });
-   socket.on("end", function () {
+   socket.on("end", function (user) {
+      console.log(user);
       console.log("Client closed Connection");
    });
    socket.on("error", function () {
