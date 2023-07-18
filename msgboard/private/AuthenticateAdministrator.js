@@ -1,14 +1,17 @@
 const fs = require("fs");
 var thisModule = this;
 exports.processRequest = function (request, response) {
-	response.setContentType("text/html");
-	response.write("<!Doctype Html>");
-	response.write("<HTML lang='en'>");
-	response.write("<head>");
-	response.write("<title>College Message Board</title>");
-	response.write("<meta charset='utf-8'>");
+	var username = request.data["username"];
+	var password = request.data["password"];
+	var administrator = JSON.parse(fs.readFileSync("./private\\data\\admin.conf"));
+	if (administrator.username != username || administrator.password != password) {
+		response.setContentType("text/html");
+		response.write("<!Doctype Html>");
+		response.write("<HTML lang='en'>");
+		response.write("<head>");
+		response.write("<title>College Message Board</title>");
+		response.write("<meta charset='utf-8'>");
 
-	if (fs.existsSync("./private\\data\\admin.conf")) {
 		//this js code runs on client side
 		response.write("<script>");
 		response.write("function validateForm(f){");
@@ -28,12 +31,12 @@ exports.processRequest = function (request, response) {
 		response.write("}");
 		response.write("</script>");
 		//js code on client side ends here
-
 		response.write("<body>");
 		response.write("<h1>Administrator Module</h1>");
 		response.write("<h3>Authentication</h3>");
+		response.write("<div style='color:red'> Invalid username/password</div>");
 		response.write(
-			"<form action='authenticateAdmin' method='post' onsubmit='()=>validateForm(this)'>"
+			"<form action='authenticateAdmin' method='post' onsubmit='return validateForm(this)'>"
 		);
 		response.write("<table border = '0'>");
 		response.write("<tr>");
@@ -53,36 +56,25 @@ exports.processRequest = function (request, response) {
 		response.write("</tr>");
 		response.write("</table>");
 		response.write("</form>");
-	} else {
-		response.write("<body>");
-		response.write("<h1>Administration Module</h1>");
-		response.write("<h3>Authentication</h3>");
-		response.write("<form action='createAdmin' method='post'>");
-		response.write("<table border = '0'>");
-		response.write("<tr>");
-		response.write("<td>Username</td>");
-		response.write(
-			"<td><input type = 'text' id='username' name='username' maxlength='15' size ='16'</td>"
-		);
-		response.write("</tr>");
-		response.write("<tr>");
-		response.write("<td>Password</td>");
-		response.write(
-			"<td><input type = 'password' id='password' name='password' maxlength='15' size ='16'</td>"
-		);
-		response.write("</tr>");
-		response.write("<tr>");
-		response.write("<td>Re-Enter Password</td>");
-		response.write(
-			"<td><input type = 'password' id='repassword' name='repassword' maxlength='15' size ='16'</td>"
-		);
-		response.write("</tr>");
-		response.write("<tr>");
-		response.write("<td colspan='2' align='center'><button type='submit'>Create</button></td>");
-		response.write("</tr>");
-		response.write("</table>");
-		response.write("</form>");
+		response.write("</body>");
+		response.write("</html>");
+		response.close();
+		return;
 	}
+
+	response.write("<!Doctype Html>");
+	response.write("<HTML lang='en'>");
+	response.write("<head>");
+	response.write("<title>College Message Board</title>");
+	response.write("<meta charset='utf-8'>");
+	response.write("<body>");
+	response.write("<h1>Administrator Module</h1>");
+	response.write("<a href='StudentAddForm.html'>Add Student</a><br>");
+	response.write("<a href='getStudents'>Students List</a><br>");
+	response.write("<a href='MessageForm.html>Post Message</a><br>");
+	response.write("<a href='messageBoard'>Message Board</a><br>");
+	response.write("<a href='logout'>Logout</a><br>");
+
 	response.write("</body>");
 	response.write("</html>");
 	response.close();

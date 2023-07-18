@@ -7,6 +7,7 @@ const requestParser = require("./requestParser");
 var mappings = configuration.getConfiguration();
 
 function Response(socket) {
+	var isSocketClosed = false; //flag variable for closing socket
 	this.responseInitiated = false;
 	this.$$$socket = socket;
 	this.contentType = "text/html";
@@ -23,6 +24,11 @@ function Response(socket) {
 			this.responseInitiated = true;
 		}
 		this.$$$socket.write(data);
+	};
+	this.close = function () {
+		if (isSocketClosed) return;
+		socket.end();
+		isSocketClosed = true;
 	};
 }
 
@@ -43,7 +49,7 @@ function serverResource(socket, resource) {
 	// var file = resource;
 	// var header = "HTTP/1.1 200 OK\n";
 	// header = header + `Content-Type: ${mimeTypes.lookup(resource)}\n`;
-	// header = header + `Content-Length: ${     }\n`; //the issue is currently i am not getting how to get content length;
+	// // header = header + `Content-Length: ${     }\n`; //the issue is currently i am not getting how to get content length;
 	// header = header + "\n";
 	// socket.write(header);
 	// var bufferSize = 1024;
@@ -63,6 +69,7 @@ function serverResource(socket, resource) {
 	// 	}
 	// 	socket.write(data);
 	// }
+	// socket.end();
 }
 
 var httpServer = net.createServer(function (socket) {
