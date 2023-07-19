@@ -1,3 +1,4 @@
+const { log } = require("console");
 const fs = require("fs");
 var thisModule = this;
 exports.processRequest = function (request, response) {

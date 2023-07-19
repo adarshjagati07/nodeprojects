@@ -1,0 +1,10 @@
+{
+    "students":[
+        {"rollNumber":101,"name":"Adarsh"},
+        {"rollNumber":102,"name":"Anmol"},
+        {"rollNumber":103,"name":"Aditya"},
+        {"rollNumber":104,"name":"Sarwang"},
+        {"rollNumber":105,"name":"Kashyap"},
+        {"rollNumber":106,"name":"Sourabh"}
+    ]
+}
