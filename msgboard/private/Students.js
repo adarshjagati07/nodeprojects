@@ -55,7 +55,7 @@ exports.processRequest = function (request, response) {
 	}
 	response.write("</tbody>");
 	response.write("</table>");
-
+	response.write("<a href='AdminHomePage.html'>Home</a>");
 	response.write("</body>");
 	response.write("</html>");
 	response.close();

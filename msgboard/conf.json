@@ -3,7 +3,7 @@
         {"path": "/admin","resource":"AdminStarter.js"},
         {"path": "/createAdmin","resource":"CreateAdministrator.js"},
         {"path": "/authenticateAdmin","resource":"AuthenticateAdministrator"},
-        {"path": "/getStudents","resource":"Students.js"}
-
+        {"path": "/getStudents","resource":"Students.js"},
+        {"path":"/addStudent","resource":"AddStudent.js"}
     ]
 }

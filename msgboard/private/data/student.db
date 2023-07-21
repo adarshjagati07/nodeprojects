@@ -1,10 +1,1 @@
-{
-    "students":[
-        {"rollNumber":101,"name":"Adarsh"},
-        {"rollNumber":102,"name":"Anmol"},
-        {"rollNumber":103,"name":"Aditya"},
-        {"rollNumber":104,"name":"Sarwang"},
-        {"rollNumber":105,"name":"Kashyap"},
-        {"rollNumber":106,"name":"Sourabh"}
-    ]
-}
+{"students":[{"rollNumber":101,"name":"Adarsh"},{"rollNumber":102,"name":"Anmol"},{"rollNumber":103,"name":"Aditya"},{"rollNumber":104,"name":"Sarwang"},{"rollNumber":105,"name":"Kashyap"},{"rollNumber":106,"name":"Sourabh"},{"rollNumber":"107","name":"Samyak"},{"rollNumber":"108","name":"Ramesh"},{"rollNumber":"109","name":"adii"},{"rollNumber":"110","name":"Saransh"},{"rollNumber":"111","name":"Rishabh"},{"rollNumber":"112","name":"Chhatrapal"}]}

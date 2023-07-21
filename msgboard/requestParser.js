@@ -10,25 +10,25 @@ exports.parseRequest = function (data, mappings) {
 	route = w[1];
 	request.queryString = null;
 	request.data = {};
-	request.isClientSideTechnologyResource = true;
-	request.resource = route.substring(1);
 
 	if (request.method == "GET") {
 		var i = route.indexOf("?");
 		if (i != -1) {
-			request.isClientSideTechnologyResource = false;
 			request.queryString = route.substring(i + 1);
 			request.data = JSON.parse(JSON.stringify(qs.decode(request.queryString)));
 			route = route.substring(0, i);
+
 			//temoporarily for data printing and debugging
-			console.log(request.queryString);
-			console.log("--------------------");
-			console.log(request.data);
+			// console.log("******************")
+			// console.log(request);
+			// console.log("******************")
+			// console.log(request.queryString);
+			// console.log("--------------------");
+			// console.log(request.data);
 			//untill here
 		}
 	}
 	if (request.method == "POST") {
-		request.isClientSideTechnologyResource = false;
 		var lastLine = splits[splits.length - 1];
 		request.queryString = lastLine;
 		request.data = JSON.parse(JSON.stringify(qs.decode(request.queryString)));
@@ -43,14 +43,18 @@ exports.parseRequest = function (data, mappings) {
 		request.isClientSideTechnologyResource = true;
 		return request;
 	} else {
-		var paths = mappings.paths;
-		paths.forEach(function (obj) {
-			if (obj.path == route) {
+		var e = 0;
+		while (e < mappings.paths.length) {
+			if (mappings.paths[e].path == route) {
+				request.resource = mappings.paths[e].resource;
 				request.isClientSideTechnologyResource = false;
-				request.resource = obj.resource;
 				return request;
 			}
-		});
+			e++;
+		}
+
+		request.isClientSideTechnologyResource = true;
+		request.resource = route.substring(1);
 		return request;
 	}
 };
