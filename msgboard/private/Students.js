@@ -47,8 +47,12 @@ exports.processRequest = function (request, response) {
 			response.write("<td>" + (e + 1) + ".</td>");
 			response.write("<td>" + student.rollNumber + "</td>");
 			response.write("<td>" + student.name + "</td>");
-			response.write("<td><a href='editStudent'>Edit</a></td>");
-			response.write("<td><a href='deleteStudent'>Delete</a></td>");
+			response.write(
+				"<td><a href='editStudent?rollNumber=" + student.rollNumber + "'>Edit</a></td>"
+			);
+			response.write(
+				"<td><a href='deleteStudent?rollNumber=" + student.rollNumber + "'>Delete</a></td>"
+			);
 			response.write("</tr>");
 			e++;
 		}

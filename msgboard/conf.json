@@ -4,6 +4,10 @@
         {"path": "/createAdmin","resource":"CreateAdministrator.js"},
         {"path": "/authenticateAdmin","resource":"AuthenticateAdministrator"},
         {"path": "/getStudents","resource":"Students.js"},
-        {"path":"/addStudent","resource":"AddStudent.js"}
+        {"path":"/addStudent","resource":"AddStudent.js"},
+        {"path":"/editStudent","resource":"EditStudent.js"},
+        {"path":"/updateStudent","resource":"UpdateStudent.js"}, 
+        {"path":"/deleteStudent","resource":"DeleteStudent.js"},
+        {"path":"/deleteStudentConfirmation","resource":"DeleteStudentConfirmation.js"}
     ]
 }

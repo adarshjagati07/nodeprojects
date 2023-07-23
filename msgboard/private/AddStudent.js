@@ -39,7 +39,7 @@ exports.processRequest = function (request, response) {
 		response.write("}");
 		response.write("if (name.length == 0) {");
 		response.write("valid = false;");
-		response.write("nameErrorSection.innerHTML = 'Required field'");
+		response.write("nameErrorSection.innerHTML = 'Required field';");
 		response.write("}");
 		response.write("if (rollNumber.length > 0) {");
 		response.write("var e = 0;");
