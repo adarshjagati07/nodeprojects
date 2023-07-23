@@ -51,7 +51,9 @@ exports.processRequest = function (request, response) {
 				"<td><a href='editStudent?rollNumber=" + student.rollNumber + "'>Edit</a></td>"
 			);
 			response.write(
-				"<td><a href='deleteStudent?rollNumber=" + student.rollNumber + "'>Delete</a></td>"
+				"<td><a href='deleteStudentConfirmation?rollNumber=" +
+					student.rollNumber +
+					"'>Delete</a></td>"
 			);
 			response.write("</tr>");
 			e++;
