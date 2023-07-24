@@ -75,16 +75,23 @@ function serverResource(socket, resource) {
 var httpServer = net.createServer(function (socket) {
 	socket.on("data", function (data) {
 		var request = requestParser.parseRequest(data, mappings);
-		if (request.error != 0) {
-			errors.processError(request.error, socket, request.resource);
-		}
-		if (request.isClientSideTechnologyResource) {
-			serverResource(socket, request.resource);
-		} else {
-			console.log("Server side resource : " + request.resource + " will be processed ");
-			var service = require("./private/" + request.resource);
-			service.processRequest(request, new Response(socket));
-		}
+		while (true) {
+			if (request.error != 0) {
+				errors.processError(request.error, socket, request.resource);
+				return;
+			}
+			if (request.isClientSideTechnologyResource) {
+				serverResource(socket, request.resource);
+				return;
+			} else {
+				console.log("Server side resource : " + request.resource + " will be processed ");
+				var service = require("./private/" + request.resource);
+				service.processRequest(request, new Response(socket));
+				if (request.isForwarded() == false) return;
+
+				//code to be written
+			}
+		} //infinite loop ends
 	});
 	socket.on("end", function () {
 		console.log("Connection closed by Client");

@@ -10,6 +10,13 @@ exports.parseRequest = function (data, mappings) {
 	route = w[1];
 	request.queryString = null;
 	request.data = {};
+	request.forwardTo = null;
+	request.forward = function (forwardToResource) {
+		this.forwardTo = forwardToResource;
+	};
+	request.isForwarded = function () {
+		return this.forwardTo != null;
+	};
 
 	if (request.method == "GET") {
 		var i = route.indexOf("?");
