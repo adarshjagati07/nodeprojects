@@ -1,4 +1,6 @@
+const fs = require("fs");
 const qs = require("querystring");
+const jst2js = require("./jst2js");
 exports.parseRequest = function (data, mappings) {
 	var request = {}; //created an empty object
 	request.error = 0;
@@ -39,15 +41,23 @@ exports.parseRequest = function (data, mappings) {
 		var lastLine = splits[splits.length - 1];
 		request.queryString = lastLine;
 		request.data = JSON.parse(JSON.stringify(qs.decode(request.queryString)));
-	}
-	if (route == "/private" || route.startsWith("/private/")) {
+	} else if (route == "/private" || route.startsWith("/private/")) {
 		request.resource = route.substring(1);
 		request.error = 404;
 		return request;
-	}
-	if (route == "/") {
+	} else if (route == "/") {
 		request.resource = "index.html";
 		request.isClientSideTechnologyResource = true;
+		return request;
+	} else if (route.endsWith(".jst")) {
+		if (fs.existsSync(route.substring(1))) {
+			request.isClientSideTechnologyResource = false;
+			request.resource = jst2js.prepareJS(route.substring(1));
+		} else {
+			request.error = 404;
+			request.resource = route;
+			request.isClientSideTechnologyResource = true;
+		}
 		return request;
 	} else {
 		var e = 0;

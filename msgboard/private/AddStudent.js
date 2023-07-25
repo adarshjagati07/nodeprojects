@@ -17,7 +17,10 @@ exports.processRequest = function (request, response) {
 		}
 	}
 	if (found) {
-		request.forward("StudentAddForm.html");
+		request.error = "Roll Number Exists";
+		request.rollNumber = rollNumber;
+		request.name = name;
+		request.forward("StudentAddForm.jst");
 		return;
 	}
 	//save and send back acknowlegement
@@ -30,5 +33,4 @@ exports.processRequest = function (request, response) {
 	};
 	fs.writeFileSync("./private\\data\\student.db", JSON.stringify(jsonToWrite));
 	request.forward("StudentAddedNotification.html");
-	response.close();
 };

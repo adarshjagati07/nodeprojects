@@ -4,6 +4,7 @@ const net = require("net");
 const configuration = require("./configuration");
 const errors = require("./errors");
 const requestParser = require("./requestParser");
+const jst2js = require("./js2js");
 var mappings = configuration.getConfiguration();
 
 function Response(socket) {
@@ -76,6 +77,7 @@ var httpServer = net.createServer(function (socket) {
 	socket.on("data", function (data) {
 		var request = requestParser.parseRequest(data, mappings);
 		while (true) {
+			request.forwardTo = null;
 			if (request.error != 0) {
 				errors.processError(request.error, socket, request.resource);
 				return;
@@ -88,8 +90,38 @@ var httpServer = net.createServer(function (socket) {
 				var service = require("./private/" + request.resource);
 				service.processRequest(request, new Response(socket));
 				if (request.isForwarded() == false) return;
+				var forwardTo = request.forwardTo;
+				request.isClientSideTechnologyResource = true;
 
-				//code to be written
+				if (
+					forwardTo == "/private" ||
+					forwardTo.startsWith("/private/" || forwardTo.startsWith("private/"))
+				) {
+					request.error = 500;
+				} else if (forwardTo == "/") {
+					request.resource = "index.html";
+				} else if (forwardTo.endsWith(".jst")) {
+					if (fs.existsSync(forwardTo)) {
+						request.isClientSideTechnologyResource = false;
+						request.resource = jst2js.prepareJS(forwardTo);
+					} else {
+						request.error = 404;
+						request.resource = forwardTo;
+					}
+				} else {
+					var e = 0;
+					while (e < mappings.paths.length) {
+						if (mappings.paths[e].path == "/" + forwardTo) {
+							request.resource = mappings.paths[e].resource;
+							request.isClientSideTechnologyResource = false;
+							break;
+						}
+						e++;
+					}
+					if (request.isClientSideTechnologyResource) {
+						request.resource = forwardTo;
+					}
+				}
 			}
 		} //infinite loop ends
 	});
