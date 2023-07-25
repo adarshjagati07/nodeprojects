@@ -16,3 +16,5 @@ In one command prompt our server is running which will send response that has be
 This is a basic app which is going to use the server created by me. (AJHttpServer)<br>
 Main Aim of this project is to to test my Server and enrich it with all the requirements possible to create a good web server.<br>
 I am going to give it functionalites of login signup, Admin and user support, and all the CRUD related functionatlites.  <br>
+
+Though i have made some changes over here from my previous server. Firstly I'll test them over here then implement in the main server.
