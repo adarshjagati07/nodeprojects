@@ -41,11 +41,13 @@ exports.parseRequest = function (data, mappings) {
 		var lastLine = splits[splits.length - 1];
 		request.queryString = lastLine;
 		request.data = JSON.parse(JSON.stringify(qs.decode(request.queryString)));
-	} else if (route == "/private" || route.startsWith("/private/")) {
+	}
+	if (route == "/private" || route.startsWith("/private/")) {
 		request.resource = route.substring(1);
 		request.error = 404;
 		return request;
-	} else if (route == "/") {
+	}
+	if (route == "/") {
 		request.resource = "index.html";
 		request.isClientSideTechnologyResource = true;
 		return request;

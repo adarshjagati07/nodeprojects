@@ -4,7 +4,7 @@ const net = require("net");
 const configuration = require("./configuration");
 const errors = require("./errors");
 const requestParser = require("./requestParser");
-const jst2js = require("./js2js");
+const jst2js = require("./jst2js");
 var mappings = configuration.getConfiguration();
 
 function Response(socket) {

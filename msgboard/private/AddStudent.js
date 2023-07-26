@@ -17,7 +17,7 @@ exports.processRequest = function (request, response) {
 		}
 	}
 	if (found) {
-		request.error = "Roll Number Exists";
+		request.errorMessage = "Roll Number Exists";
 		request.rollNumber = rollNumber;
 		request.name = name;
 		request.forward("StudentAddForm.jst");

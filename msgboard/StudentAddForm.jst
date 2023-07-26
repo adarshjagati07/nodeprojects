@@ -9,7 +9,7 @@
             var rollNumber = frm.rollNumber.value.trim();
             var name = frm.name.value.trim();
             var rollNumberErrorSection = document.getElementById('rollNumberErrorSection');
-            var nameErrorSection = document.getElementById('nameErrorSection')
+            var nameErrorSection = document.getElementById('nameErrorSection');
             rollNumberErrorSection.innerHTML = '';
             nameErrorSection.innerHTML = '';
             var valid = true;
@@ -19,7 +19,7 @@
             }
             if (name.length == 0) {
                 valid = false;
-                nameErrorSection.innerHTML = 'Required field'
+                nameErrorSection.innerHTML = 'Required field';
             }
             if (rollNumber.length > 0) {
                 var e = 0;
@@ -48,6 +48,8 @@
             <td align="right"><a href="logout">Logout</a></td>
         </tr>
     </table>
+
+    <span color='red'>$$${errorMessage}</span>
 
     <form action="addStudent" onsubmit="return validateForm(this)">
         <table>

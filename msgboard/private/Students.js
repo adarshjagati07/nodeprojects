@@ -15,7 +15,7 @@ exports.processRequest = function (request, response) {
 	response.write("<body>");
 
 	response.write("<h1>Administrator Module</h1>");
-	response.write("<a href='StudentAddForm.html'>ADD</a>");
+	response.write("<a href='StudentAddForm.jst'>ADD</a>");
 	response.write("<table width='70%' align='center'>");
 	response.write("<tr>");
 	response.write("<td><h3>Students</h3></td>");
