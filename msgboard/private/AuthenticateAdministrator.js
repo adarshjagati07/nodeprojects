@@ -71,7 +71,7 @@ exports.processRequest = function (request, response) {
 	response.write("<h1>Administrator Module</h1>");
 	response.write("<a href='StudentAddForm.jst'>Add Student</a><br>");
 	response.write("<a href='getStudents'>Students List</a><br>");
-	response.write("<a href='MessageForm.html>Post Message</a><br>");
+	response.write("<a href='MessageForm.html'>Post Message</a><br>");
 	response.write("<a href='messageBoard'>Message Board</a><br>");
 	response.write("<a href='logout'>Logout</a><br>");
 

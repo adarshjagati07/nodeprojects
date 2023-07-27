@@ -1,5 +1,5 @@
 const fs = require("fs");
-exports.prepareJS = function (jstFile) {
+exports.prepareJS = function (jstFile, request) {
 	var privateFolder = "./private";
 	if (!fs.existsSync(privateFolder)) {
 		fs.mkdirSync(privateFolder);
@@ -20,6 +20,26 @@ exports.prepareJS = function (jstFile) {
 	for (i in lines) {
 		line = lines[i].replace(/\r|\n/g, "");
 		line = line.replace(/"/g, '\\"');
+
+		//placing our dynamic content via request.
+		line = line.replace(/\$\$\$\{.*?\}/g, function (keyword) {
+			var length = keyword.length;
+			keyword = keyword.substring(4, length - 1);
+			var flag = 0;
+			for (const property in request) {
+				if (keyword == property) {
+					flag = 1;
+					break;
+				}
+			}
+			if (flag == 1) {
+				return `\"+request.${keyword}+\"`;
+			} else {
+				return "";
+			}
+		});
+		//dynamic content placing ends here
+
 		fs.writeSync(jsFile, 'response.write("' + line + '");\r\n');
 	}
 

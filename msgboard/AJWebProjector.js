@@ -1,3 +1,4 @@
+const path = require("path");
 const fs = require("fs");
 const mimeTypes = require("mime-types");
 const net = require("net");
@@ -38,39 +39,30 @@ function serverResource(socket, resource) {
 		errors.send404(socket, resource);
 		return;
 	}
-	//do not use the following code, instead send data in chunks of 1024
-	var data = fs.readFileSync(resource, "utf-8");
+
+	var file = resource;
 	var header = "HTTP/1.1 200 OK\n";
 	header = header + `Content-Type: ${mimeTypes.lookup(resource)}\n`;
-	header = header + `Content-Length: ${data.length}\n`;
 	header = header + "\n";
-	var response = header + data;
-	socket.write(response);
-
-	// var file = resource;
-	// var header = "HTTP/1.1 200 OK\n";
-	// header = header + `Content-Type: ${mimeTypes.lookup(resource)}\n`;
-	// // header = header + `Content-Length: ${     }\n`; //the issue is currently i am not getting how to get content length;
-	// header = header + "\n";
-	// socket.write(header);
-	// var bufferSize = 1024;
-	// var buffer = Buffer.alloc(bufferSize);
-	// var fileDescriptor = fs.openSync(file, "r");
-	// var data;
-	// var bytesExtracted;
-	// while (true) {
-	// 	bytesExtracted = fs.readSync(fileDescriptor, buffer, 0, bufferSize);
-	// 	if (bytesExtracted == 0) {
-	// 		fs.closeSync(fileDescriptor);
-	// 		break;
-	// 	} else if (bytesExtracted < bufferSize) {
-	// 		data = buffer.slice(0, bytesExtracted);
-	// 	} else {
-	// 		data = buffer;
-	// 	}
-	// 	socket.write(data);
-	// }
-	// socket.end();
+	socket.write(header);
+	var bufferSize = 1024;
+	var buffer = Buffer.alloc(bufferSize);
+	var fileDescriptor = fs.openSync(file, "r");
+	var data;
+	var bytesExtracted;
+	while (true) {
+		bytesExtracted = fs.readSync(fileDescriptor, buffer, 0, bufferSize);
+		if (bytesExtracted == 0) {
+			fs.closeSync(fileDescriptor);
+			break;
+		} else if (bytesExtracted < bufferSize) {
+			data = buffer.slice(0, bytesExtracted);
+		} else {
+			data = buffer;
+		}
+		socket.write(data);
+	}
+	socket.end();
 }
 
 var httpServer = net.createServer(function (socket) {
@@ -87,6 +79,10 @@ var httpServer = net.createServer(function (socket) {
 				return;
 			} else {
 				console.log("Server side resource : " + request.resource + " will be processed ");
+				//these two lines of code will ensure that older version is removed from cache
+				var absolutePath = path.resolve("./private/" + request.resource);
+				delete require.cache[absolutePath];
+
 				var service = require("./private/" + request.resource);
 				service.processRequest(request, new Response(socket));
 				if (request.isForwarded() == false) return;
@@ -98,12 +94,13 @@ var httpServer = net.createServer(function (socket) {
 					forwardTo.startsWith("/private/" || forwardTo.startsWith("private/"))
 				) {
 					request.error = 500;
-				} else if (forwardTo == "/") {
+				}
+				if (forwardTo == "/") {
 					request.resource = "index.html";
 				} else if (forwardTo.endsWith(".jst")) {
 					if (fs.existsSync(forwardTo)) {
 						request.isClientSideTechnologyResource = false;
-						request.resource = jst2js.prepareJS(forwardTo);
+						request.resource = jst2js.prepareJS(forwardTo, request);
 					} else {
 						request.error = 404;
 						request.resource = forwardTo;

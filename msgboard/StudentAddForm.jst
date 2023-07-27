@@ -49,18 +49,18 @@
         </tr>
     </table>
 
-    <span color='red'>$$${errorMessage}</span>
+    <span style='color:red'>$$${errorMessage}</span>
 
     <form action="addStudent" onsubmit="return validateForm(this)">
         <table>
             <tr>
                 <td>Roll Number : </td>
-                <td><input type="text" id="rollNumber" name="rollNumber" maxlength="20" size="22"></td>
+                <td><input type="text" id="rollNumber" value="$$${rollNumber}" name="rollNumber" maxlength="20" size="22"></td>
                 <td><span id="rollNumberErrorSection" style="color: red;"></span></td>
             </tr>
             <tr>
                 <td>Name : </td>
-                <td><input type="text" id="name" name="name" maxlength="20" size="22"></td>
+                <td><input type="text" id="name" value="$$${name}" name="name" maxlength="20" size="22"></td>
                 <td><span id="nameErrorSection" style="color: red;"></span></td>
             </tr>
             <tr>
