@@ -7,6 +7,7 @@ exports.parseRequest = function (data, mappings) {
 	var str = data.toString();
 	var splits = str.split("\n");
 	var firstLine = splits[0];
+	request.isClassMapping = false;
 	var w = firstLine.split(" ");
 	request.method = w[0].toUpperCase();
 	route = w[1];
@@ -67,7 +68,30 @@ exports.parseRequest = function (data, mappings) {
 			if (mappings.paths[e].path == route) {
 				request.resource = mappings.paths[e].resource;
 				request.isClientSideTechnologyResource = false;
+				console.log("here");
 				return request;
+			}
+			console.log("loop");
+			console.log(route);
+			if (route.startsWith(mappings.paths[e].path + "/")) {
+				console.log("inside mapping");
+				console.log(mappings.paths[e].methods);
+				if (mappings.paths[e].methods) {
+					slashIndex = route.indexOf("/", 1); //after first index which is slash at zeroth index
+					operation = route.substring(slashIndex);
+					var className = mappings.paths[e].module;
+					console.log("operation", mappings.paths[e].methods[operation]);
+					if (mappings.paths[e].methods[operation]) {
+						if (mappings.paths[e].module) {
+							request.isClientSideTechnologyResource = false;
+							request.isClassMapping = true;
+							request.serviceMethod = mappings.paths[e].methods[operation];
+							request.resource = className + ".js";
+							console.log(request);
+							return request;
+						}
+					}
+				}
 			}
 			e++;
 		}

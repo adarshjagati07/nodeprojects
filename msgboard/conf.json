@@ -8,6 +8,7 @@
         {"path":"/editStudent","resource":"EditStudent.js"},
         {"path":"/updateStudent","resource":"UpdateStudent.js"}, 
         {"path":"/deleteStudent","resource":"DeleteStudent.js"},
-        {"path":"/deleteStudentConfirmation","resource":"DeleteStudentConfirmation.js"}
+        {"path":"/deleteStudentConfirmation","resource":"DeleteStudentConfirmation.js"},
+        {"path": "/student","module":"StudentManager", "methods": {"/add":"add","/delete":"delete"}} 
     ]
 }

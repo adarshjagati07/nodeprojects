@@ -84,6 +84,12 @@ var httpServer = net.createServer(function (socket) {
 				delete require.cache[absolutePath];
 
 				var service = require("./private/" + request.resource);
+				if (request.isClassMapping) {
+					var object = new service();
+					object[request.serviceMethod]();
+					break; //can be changed later on
+					//lot more programming yet to be implemented
+				}
 				service.processRequest(request, new Response(socket));
 				if (request.isForwarded() == false) return;
 				var forwardTo = request.forwardTo;
