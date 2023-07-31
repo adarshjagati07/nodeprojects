@@ -6,6 +6,7 @@ const configuration = require("./configuration");
 const errors = require("./errors");
 const requestParser = require("./requestParser");
 const jst2js = require("./jst2js");
+const { resourceUsage } = require("process");
 var mappings = configuration.getConfiguration();
 
 function Response(socket) {
@@ -84,11 +85,87 @@ var httpServer = net.createServer(function (socket) {
 				delete require.cache[absolutePath];
 
 				var service = require("./private/" + request.resource);
+
 				if (request.isClassMapping) {
+					var resultJSON;
+					var requestData = {};
 					var object = new service();
-					object[request.serviceMethod]();
-					break; //can be changed later on
-					//lot more programming yet to be implemented
+					resultJSON = object[request.serviceMethod](requestData);
+					if (resultJSON) {
+						if (resultJSON.forward) {
+							request.isClientSideTechnologyResource = true;
+							if (
+								resultJSON.forward == "/private" ||
+								resultJSON.forward == "/private/"
+							) {
+								request.error = 500;
+							} else if (resultJSON.forward == "/") {
+								request.resource = "index.html";
+							} else if (resultJSON.forward.endsWith(".jst")) {
+								if (fs.existsSync(resultJSON.forward.substring(1))) {
+									request.resource = jst2js.prepareJS(
+										resultJSON.forward.substring(1),
+										request
+									);
+									request.isClientSideTechnologyResource = false;
+								} else {
+									request.error = 404;
+									request.resource = resultJSON.forward;
+									return request;
+								}
+							} else {
+								var secondSlashIndex;
+								var methodKey;
+								e = 0;
+								while (e < mappings.paths.length) {
+									if (
+										mappings.paths[e].path == resultJSON.forward &&
+										mappings.paths[e].resource
+									) {
+										request.resource = mappings.paths[e].resource;
+										request.isClientSideTechnologyResource = false;
+									}
+									if (
+										mappings.paths[e].module &&
+										(resultJSON.forward.startsWith(
+											mappings.paths[e].path + "/"
+										) ||
+											resultJSON.forward == mappings.paths[e].path)
+									) {
+										if (mappings.paths[e].methods) {
+											secondSlashIndex = resultJSON.forward.indexOf("/", 1);
+											if (secondSlashIndex == -1) {
+												methodKey = "/";
+											} else {
+												methodKey =
+													resultJSON.forward.substring(secondSlashIndex);
+											}
+											if (mappings.paths[e].methods[methodKey]) {
+												if (mappings.paths[e].module) {
+													request.isClassMapping = true;
+													request.isClientSideTechnologyResource = false;
+													request.resource =
+														mappings.paths[e].module + ".js";
+													request.serviceMethod =
+														mappings.paths[e].methods[methodKey];
+													return request;
+												}
+											}
+										}
+									}
+									e++;
+								}
+							}
+							if (request.isClientSideTechnologyResource) {
+								request.resource = resultJSON.forward.substring(1);
+								//some changes to be done here later on
+							}
+							continue;
+						}
+						//code to send back the JSON in response with mime type set ot application/json
+					} //resultJSON block ends
+
+					break;
 				}
 				service.processRequest(request, new Response(socket));
 				if (request.isForwarded() == false) return;

@@ -63,31 +63,32 @@ exports.parseRequest = function (data, mappings) {
 		}
 		return request;
 	} else {
+		var secondSlashIndex;
+		var methodKey;
 		var e = 0;
 		while (e < mappings.paths.length) {
-			if (mappings.paths[e].path == route) {
+			if (mappings.paths[e].path == route && mappings.paths[e].resource) {
 				request.resource = mappings.paths[e].resource;
 				request.isClientSideTechnologyResource = false;
-				console.log("here");
 				return request;
 			}
-			console.log("loop");
-			console.log(route);
-			if (route.startsWith(mappings.paths[e].path + "/")) {
-				console.log("inside mapping");
-				console.log(mappings.paths[e].methods);
+			if (
+				mappings.paths[e].module &&
+				(route.startsWith(mappings.paths[e].path + "/") || route == mappings.paths[e].path)
+			) {
 				if (mappings.paths[e].methods) {
-					slashIndex = route.indexOf("/", 1); //after first index which is slash at zeroth index
-					operation = route.substring(slashIndex);
-					var className = mappings.paths[e].module;
-					console.log("operation", mappings.paths[e].methods[operation]);
-					if (mappings.paths[e].methods[operation]) {
+					secondSlashIndex = route.indexOf("/", 1); //after first index which is slash at zeroth index
+					if (secondSlashIndex == -1) {
+						methodKey = "/";
+					} else {
+						methodKey = route.substring(secondSlashIndex);
+					}
+					if (mappings.paths[e].methods[methodKey]) {
 						if (mappings.paths[e].module) {
 							request.isClientSideTechnologyResource = false;
 							request.isClassMapping = true;
-							request.serviceMethod = mappings.paths[e].methods[operation];
-							request.resource = className + ".js";
-							console.log(request);
+							request.serviceMethod = mappings.paths[e].methods[methodKey];
+							request.resource = mappings.paths[e].module + ".js";
 							return request;
 						}
 					}
