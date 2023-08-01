@@ -88,7 +88,7 @@ var httpServer = net.createServer(function (socket) {
 
 				if (request.isClassMapping) {
 					var resultJSON;
-					var requestData = {};
+					var requestData = request.data;
 					var object = new service();
 					resultJSON = object[request.serviceMethod](requestData);
 					if (resultJSON) {
@@ -163,6 +163,10 @@ var httpServer = net.createServer(function (socket) {
 							continue;
 						}
 						//code to send back the JSON in response with mime type set ot application/json
+						var response = new Response(socket);
+						response.setContentType("application/json");
+						response.write(JSON.stringify(resultJSON));
+						response.close();
 					} //resultJSON block ends
 
 					break;
