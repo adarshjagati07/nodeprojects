@@ -65,6 +65,15 @@ module.exports = class AdminManager {
 		};
 	}
 	logout() {
-		console.log("logout got called");
+		return {
+			"forward": "/private/AdminIndex.html"
+		};
+	}
+
+	home() {
+		//i will change this code later on, and apply check for backdoor entry
+		return {
+			"forward": "/private/AdminHome.html"
+		};
 	}
 };

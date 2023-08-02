@@ -111,7 +111,6 @@ var httpServer = net.createServer(function (socket) {
 								} else {
 									request.error = 404;
 									request.resource = resultJSON.forward;
-									return request;
 								}
 							} else {
 								var secondSlashIndex;
@@ -148,7 +147,7 @@ var httpServer = net.createServer(function (socket) {
 														mappings.paths[e].module + ".js";
 													request.serviceMethod =
 														mappings.paths[e].methods[methodKey];
-													return request;
+													break;
 												}
 											}
 										}
