@@ -38,24 +38,81 @@
         }
     </style>
     <script>
-        document.getElementById('second-btn').style.display = 'none';
-        function myFunction() {
-
+        function findAndPrintTagName(element) {
+            var tag = element.tagName;
+            console.log("Tag of " + element.id + " is :", tag)
         }
-        function someFunc() {
-
+        function sam() {
+            var a = document.getElementById("abcd");
+            findAndPrintTagName(a);
         }
-        function func() {
-
+        function tom() {
+            var a = document.getElementById("pqr");
+            findAndPrintTagName(a);
+        }
+        function john() {
+            var a = document.getElementById("msms");
+            findAndPrintTagName(a);
+        }
+        function createDivAndAppend() {
+            var body = document.querySelector('body');
+            var div = document.createElement('div');
+            div.textContent = 'Some text (Div Created at the end)';
+            body.appendChild(div);
+        }
+        function insertDivAfter() {
+            var div = document.createElement('div');
+            div.textContent = 'Some text (After)';
+            var span = document.getElementById('pqr');
+            span.after(div);
+        }
+        function insertDivBefore() {
+            var div = document.createElement('div');
+            div.textContent = 'Some text (Before)';
+            var span = document.getElementById('pqr');
+            span.before(div);
+        }
+        function addStyleToDiv() {
+            var div = document.querySelector('#pqr');
+            div.style.backgroundColor = "magenta";
+            div.style.fontSize = "12pt"
+        }
+        function addClass() {
+            var element = document.getElementById('abcd');
+            element.classList.add('sample');
+        }
+        function removeClass() {
+            var element = document.getElementById('abcd');
+            element.classList.remove('sample');
+        }
+        function toggleHide() {
+            var div = document.getElementById("abcd");
+            if (div.style.display === "none") {
+                div.style.display = "block";
+            } else {
+                div.style.display = "none";
+            }
         }
     </script>
 </head>
 
 <body>
     <h1>Administration Form</h1>
-    <button type="button" id="first-btn" onclick="myFunction()">Click here</button>
-    <button type="button" id="second-btn" onclick="someFunc()">first-btn</button>
-    <button type="button" id="third-btn" onclick="func()">third-btn</button>
+    <div id="abcd" class="compname">
+        whatever
+    </div>
+    <span id="pqr" class="customer">Cool</span>
+    <form id="msms"></form>
+    <button type="button" onclick="sam()">Button (div)</button><br>
+    <button type="button" onclick="tom()">Button (span)</button><br>
+    <button type="button" onclick="john()">Button (form) </button><br>
+    <button type="button" onclick="createDivAndAppend()">Create Div at the end</button><br>
+    <button type="button" onclick="insertDivAfter()">Insert After Cool</button><br>
+    <button type="button" onclick="insertDivBefore()">Insert Before Cool</button><br>
+    <button type="button" onclick="addStyleToDiv()">Add Style to Div</button><br>
+    <button type="button" onclick="addClass()">Adding style class</button><br>
+    <button type="button" onclick="removeClass()">Removing style class</button><br>
+    <button type="button" onclick="toggleHide()">Toggle Hide</button><br>
 
 </body>
 
